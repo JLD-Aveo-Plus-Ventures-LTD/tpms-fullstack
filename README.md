@@ -1,70 +1,76 @@
-# Getting Started with Create React App
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# **Ticket Payment Management System (TPMS)**
 
-## Available Scripts
+## **Overview**
+This project is a full-stack application designed for ticket payment management. It consists of a **client-side React** application and a **server-side Node.js** application.
 
-In the project directory, you can run:
+## **Project Structure**
+- **client/**: React frontend
+- **server/**: Node.js backend with Express
+- **.gitignore**: Specifies files and folders that should be ignored by Git
 
-### `npm start`
+## **Prerequisites**
+Before running the application, ensure you have the following installed:
+- [Node.js](https://nodejs.org/) (v16 or above)
+- [npm](https://www.npmjs.com/) (Node Package Manager)
+- [Git](https://git-scm.com/)
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## **Setup Instructions**
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+### 1. **Clone the Repository**
+Clone the project to your local machine:
+```bash
+git clone https://github.com/JLD-Aveo-Plus-Ventures-LTD/tpms-fullstack.git
+cd tpms-fullstack
+```
 
-### `npm test`
+### 2. **Setting Up the Backend (Server)**
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+#### 2.1 Install Backend Dependencies
+Navigate to the `server` folder and install the dependencies:
+```bash
+cd server
+npm install
+```
 
-### `npm run build`
+#### 2.2 Configure Database
+- Ensure you have your database set up (using a database like PostgreSQL, MongoDB, etc.).
+- Update the `server/config/db.js` file with your database connection details.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+#### 2.3 Run the Backend
+Start the backend server:
+```bash
+npm start
+```
+This will start your backend API on the configured port (usually `http://localhost:5000`).
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### 3. **Setting Up the Frontend (Client)**
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+#### 3.1 Install Frontend Dependencies
+Navigate to the `client` folder and install the dependencies:
+```bash
+cd ../client
+npm install
+```
 
-### `npm run eject`
+#### 3.2 Run the Frontend
+Start the frontend React application:
+```bash
+npm start
+```
+The frontend will run on `http://localhost:3000`.
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+### 4. **Testing the Application**
+After running both the backend and frontend, you can visit `http://localhost:3000` to interact with the application.
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## **Contributing**
+1. Fork the repository.
+2. Create your feature branch (`git checkout -b feature-name`).
+3. Commit your changes (`git commit -am 'Add feature'`).
+4. Push to the branch (`git push origin feature-name`).
+5. Create a new Pull Request.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+## **License**
+This project is licensed under the MIT License.
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+---
