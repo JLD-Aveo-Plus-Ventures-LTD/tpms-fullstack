@@ -1,0 +1,158 @@
+.nav-item {
+  margin-left: 20px;
+  margin-top: -5px;
+}
+.dropdown-arrow {
+  transform: rotate(90deg);
+  margin-left: 80px;
+  margin-top: 3px;
+}
+
+/* Search Bar with Icon */
+.search-bar {
+  position: relative;
+  margin: 20px 0;
+  display: flex;
+  align-items: center;
+}
+
+.search-bar input {
+  width: 100%;
+  padding: 10px 40px 10px 15px;
+  border: 1px solid #16a34a;
+  border-radius: 10px;
+  font-size: 1rem;
+  text-indent: 30px;
+}
+
+.search-bar i {
+  position: absolute;
+  left: 10px;
+  font-size: 1.2rem;
+  pointer-events: none;
+}
+
+.search-bar input:focus {
+  outline: none;
+  border-color: #16a34a;
+  box-shadow: 0 0 5px rgba(76, 175, 80, 0.3);
+}
+
+.activeStatus {
+  color: #029447;
+}
+
+/* Tabs */
+
+.tabs {
+  display: flex;
+  color: #555;
+  cursor: pointer;
+}
+.tabs p {
+  margin: 10px 20px -5px 0;
+  padding-bottom: 5px;
+}
+
+.tabs .active-tab {
+  color: #029447;
+  border-bottom: 3px solid #029447;
+}
+
+/* Transactions Table */
+.transactions-table {
+  margin: 20px 0;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.transactions-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.transactions-table th,
+.transactions-table td {
+  padding: 10px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.transactions-table th {
+  background-color: #f9f9f9;
+  color: #a1a1aa;
+  font-weight: normal;
+}
+
+.transactions-table td {
+  background-color: white;
+}
+
+/* Approve Button */
+.transactions-table .approve-btn {
+  background-color: white;
+  color: #16a34a;
+  border: 2px solid #16a34a;
+  padding: 3px 10px;
+  margin-right: 3px;
+  border-radius: 15px;
+  cursor: pointer;
+  width: 100px;
+}
+
+.transactions-table .approve-btn:hover {
+  background-color: #16a34a;
+  color: white;
+}
+
+/* Suspend Button */
+.transactions-table .suspend-btn {
+  background-color: white;
+  color: #e3342f;
+  border: 2px solid #e3342f;
+  padding: 3px 10px;
+  border-radius: 15px;
+  cursor: pointer;
+  width: 100px;
+}
+
+.transactions-table .suspend-btn:hover {
+  background-color: #e3342f;
+  color: white;
+}
+
+/* Pagination */
+/* Pagination Alignment */
+.transactions-content {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.transactions-table {
+  flex-grow: 1;
+}
+
+.pagination {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: auto;
+  padding: 10px 0;
+}
+
+.pagination button {
+  border: none;
+  background-color: white;
+  color: #555;
+  padding: 8px 12px;
+  margin: 0 2px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.pagination .active-page {
+  background-color: #16a34a;
+  color: white;
+}

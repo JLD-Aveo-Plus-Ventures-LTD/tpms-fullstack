@@ -1,0 +1,158 @@
+.transactions-container {
+  display: flex;
+}
+
+.transactions-content {
+  margin-left: 250px;
+  padding: 20px;
+  width: 100%;
+}
+
+.transactions-content header h6 {
+  color: #71717a;
+
+  margin-bottom: 20px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.time-display {
+  display: flex;
+  align-items: center;
+  font-weight: bold;
+  font-size: xx-large;
+  color: #16a34a;
+  margin-right: auto;
+  margin-left: 500px;
+}
+
+.time-display span {
+  font-size: x-small;
+  margin-right: 10px;
+}
+.notification-bell {
+  font-size: 1.5rem;
+  color: #16a34a;
+}
+
+.transactions {
+  background: #f9f9f9;
+  border: 1px solid #16a34a;
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 10px;
+
+  box-shadow: 0 0 5px rgba(76, 175, 80, 0.3);
+}
+
+.form-group-container {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.form-group-left,
+.form-group-right {
+  flex: 1;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+.form-group-container input:focus {
+  outline: none;
+  border-color: #16a34a;
+  box-shadow: 0 0 5px rgba(76, 175, 80, 0.3);
+}
+
+label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 10px;
+}
+
+th,
+td {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+button {
+  margin-top: 10px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.btn-important {
+  border: 1px solid #16a34a;
+  color: #16a34a;
+  box-shadow: 0 0 5px rgba(76, 175, 80, 0.7);
+  margin-bottom: 30px;
+}
+.btn-primary {
+  background: #16a34a;
+  color: white;
+  margin-right: 10px;
+  width: 150px;
+  border-radius: 10px;
+}
+
+.btn-secondary,
+.removeTask {
+  background: #ccc;
+  color: black;
+  margin-right: 10px;
+  width: 150px;
+  border-radius: 10px;
+}
+.removeTask {
+  margin-top: 10px;
+  background: red;
+  color: #fff;
+}
+.total-amount {
+  display: inline-block;
+  background-color: #16a34a;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 10px;
+  text-align: center;
+  font-weight: bold;
+  min-width: 100px;
+  margin-left: 10px;
+}
+
+.total-amount::after {
+  content: "";
+  display: inline-block;
+  width: 100px;
+}
+
+.service-total-container {
+  display: flex;
+  justify-content: space-between;
+}
+
+.addTask {
+  position: relative;
+  left: 87%;
+  margin-top: 10px;
+}
