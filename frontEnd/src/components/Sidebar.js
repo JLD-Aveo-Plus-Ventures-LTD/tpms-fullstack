@@ -1,8 +1,20 @@
 import React from "react";
 import "./Sidebar.css";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom"; // Added: Imported `useNavigate` for programmatic navigation after logout.
 
 export default function Sidebar() {
+  const navigate = useNavigate(); // Added: Hook for redirecting users to the login page after logout.
+
+  // Logout Functionality
+  const handleLogout = () => {
+    // Clear localStorage
+    localStorage.removeItem("authToken"); // Added: Removes the user's authentication token from localStorage.
+    localStorage.removeItem("userRole"); // Added: Removes the user's role from localStorage.
+
+    // Redirect to login page
+    navigate("/"); // Added: Redirects the user to the login page.
+  };
+
   return (
     <div className="sidebar">
       <div className="sidebar-logo">
@@ -17,7 +29,7 @@ export default function Sidebar() {
             {/* Transaction Menu */}
             <li className="nav-item">
               <a
-                className="nav-link  transaction-nav"
+                className="nav-link transaction-nav"
                 href="#transaction"
                 role="button"
                 data-bs-toggle="collapse"
@@ -35,7 +47,6 @@ export default function Sidebar() {
                       Tasks
                     </a>
                   </li>
-
                   <li className="nav-item">
                     <a className="dropdown-item" href="#status">
                       Status
@@ -71,11 +82,10 @@ export default function Sidebar() {
           </div>
         </div>
         <div className="sidebar-signout">
-          <Link to="/">
-            <a href="#signout" className="signout-link">
-              Sign out <i className="fas fa-sign-out-alt"></i>
-            </a>
-          </Link>
+          {/* Changed from <a> to <button> for accessibility and to attach logout logic */}
+          <button onClick={handleLogout} className="signout-link">
+            Sign out <i className="fas fa-sign-out-alt"></i>
+          </button>
         </div>
       </div>
     </div>
