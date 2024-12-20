@@ -1,55 +1,55 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import API_URL from "../config";
+import { loginUser } from "../services/apiService"; // Added: Importing the login API function to handle the backend login process.
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  // Added: State for displaying error messages when login fails or input is invalid.
   const [error, setError] = useState("");
+
+  // Added: State for showing a loading spinner or disabling the login button during the login process.
   const [loading, setLoading] = useState(false);
+
   const navigate = useNavigate();
 
   // Handle form submission
   const handleLogin = async (e) => {
     e.preventDefault();
-    setError("");
+    setError(""); // Added: Clear any previous error messages.
 
     // Basic validation
     if (!email || !password) {
-      setError("Please fill in all fields.");
-      return;
+      setError("Please fill in all fields."); // Added: Display a message prompting the user to complete the form.
+      return; // Added: Exit the function to prevent further processing.
     }
 
-    setLoading(true);
+    setLoading(true); // Added: Start the loading state to indicate processing.
 
     try {
-      // Send request to backend
-      const response = await fetch(`${API_URL}/auth/login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      });
+      const response = await loginUser(email, password); // Added: Call the login API to validate credentials.
+      const { token, role } = response.data; // Added: Extract token and role from the backend response.
 
-      const data = await response.json();
-      setLoading(false);
+      // Added: Save the authentication token to localStorage for subsequent authenticated requests.
+      localStorage.setItem("authToken", token);
 
-      if (response.ok) {
-        // Redirect based on user role
-        if (data.role === "cashier") {
-          navigate("/CashierDashboard");
-        } else if (data.role === "operator") {
-          navigate("/OperatorDashboard");
-        } else {
-          setError("Unexpected role received. Please contact support.");
-        }
+      // Added: Save the user's role to localStorage to manage role-based access.
+      localStorage.setItem("userRole", role);
+
+      // Added: Redirect the user based on their role.
+      if (role === "cashier") {
+        navigate("/CashierDashboard"); // Redirect cashier to their dashboard.
+      } else if (role === "operator") {
+        navigate("/OperatorDashboard"); // Redirect operator to their dashboard.
       } else {
-        setError(data.message || "Login failed.");
+        setError("Unexpected role received. Please contact support."); // Handle unrecognized roles gracefully.
       }
     } catch (err) {
-      setLoading(false);
-      setError("An error occurred. Please try again.");
+      console.error("Login Error:", err.response?.data?.error || err.message); // Added: Log the error to help with debugging.
+      setError(err.response?.data?.error || "Login failed. Please try again."); // Added: Display an error message to the user.
+    } finally {
+      setLoading(false); // Added: End the loading state, regardless of success or failure.
     }
   };
 
@@ -82,9 +82,9 @@ export default function LoginPage() {
             onChange={(e) => setPassword(e.target.value)}
             required
           />
-          {error && <p className="error">{error}</p>}
+          {error && <p className="error">{error}</p>} {/* Added: Display error messages when login fails */}
           <button type="submit" className="btn btn-primary" disabled={loading}>
-            {loading ? "Logging in..." : "Login →"}
+            {loading ? "Logging in..." : "Login →"} {/* Added: Show "Logging in..." when processing */}
           </button>
         </form>
 

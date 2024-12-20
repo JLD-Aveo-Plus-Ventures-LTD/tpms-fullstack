@@ -10,6 +10,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import "@fortawesome/fontawesome-free/css/all.min.css";
+import RoleProtectedRoute from "./components/RoleProtectedRoute";
 
 const router = createBrowserRouter([
   {
@@ -22,11 +23,19 @@ const router = createBrowserRouter([
   },
   {
     path: "/OperatorDashboard",
-    element: <OperatorDashboard />,
+    element: (
+      <RoleProtectedRoute role="operator">
+        <OperatorDashboard />
+      </RoleProtectedRoute>
+    ),
   },
   {
     path: "/CashierDashboard",
-    element: <CashierDashboard />,
+    element: (
+      <RoleProtectedRoute role="cashier">
+        <CashierDashboard />
+      </RoleProtectedRoute>
+    ),
   },
   {
     path: "/Transactions",
