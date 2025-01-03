@@ -7,34 +7,52 @@ exports.createTicket = (req, res) => {
   const { client_name, client_phone, services } = req.body;
   const staff_id = req.user?.user_id;
 
+  // Validate that at least one service is provided
   if (!services || services.length === 0) {
     return res.status(400).json({ error: "At least one service is required." });
   }
 
+  // 🆕 Validate that all provided service prices are valid numeric values
+  const isValidAmount = services.every((service) => !isNaN(parseFloat(service.price)));
+  if (!isValidAmount) {
+    return res.status(400).json({ error: "Invalid service prices provided." });
+  }
+
+  // Log the received request for debugging purposes
+  console.log("Received Request:", req.body);
+
+  // Generate a random ticket code
   const ticketCode = crypto.randomBytes(2).toString("hex").toUpperCase();
+
+  // Calculate the total price of all services
   const total_price = services.reduce((sum, service) => sum + parseFloat(service.price), 0);
 
+  // Query to insert the new ticket into the database
   const query = `
     INSERT INTO tickets (ticket_code, service_details, staff_id, client_name, client_phone, price, status)
     VALUES (?, ?, ?, ?, ?, ?, "Pending")
   `;
   const params = [ticketCode, client_name, staff_id, client_name, client_phone, total_price];
 
+  // Execute the query to insert the ticket
   db.query(query, params, (err, result) => {
     if (err) {
       console.error("Database Error:", err);
       return res.status(500).json({ error: "Failed to create ticket." });
     }
 
+    // Get the ID of the newly created ticket
     const ticket_id = result.insertId;
 
+    // 🆕 Prepare the data for inserting services associated with the ticket
     const serviceInserts = services.map((service) => [
       ticket_id,
       service.name,
-      service.price,
-      1,
+      parseFloat(service.price), // Ensure service price is stored as a numeric value
+      1, // Default render_count to 1
     ]);
 
+    // Query to insert services into the database
     const serviceQuery = `
       INSERT INTO services (ticket_id, service_name, price, render_count)
       VALUES ?
@@ -45,6 +63,7 @@ exports.createTicket = (req, res) => {
         return res.status(500).json({ error: "Failed to associate services with ticket." });
       }
 
+      // Respond with success, including the ticket ID, code, and total price
       res.status(201).json({
         message: "Ticket created successfully",
         ticket_id,
@@ -82,11 +101,6 @@ exports.getTickets = (req, res) => {
     res.status(200).json(results);
   });
 };
-
-
-
-
-
 
 // Update ticket status (Cashier Only)
 exports.updateTicketStatus = (req, res) => {

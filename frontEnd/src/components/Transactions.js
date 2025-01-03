@@ -42,7 +42,7 @@ const Transactions = () => {
     return () => clearInterval(interval); // Cleanup interval on unmount
   }, []);
 
-  // Effect to fetch submitted tickets from the backend
+  // Fetch submitted tickets from the backend
   useEffect(() => {
     const fetchTickets = async () => {
       try {
@@ -50,7 +50,6 @@ const Transactions = () => {
         const response = await axios.get(`${API_URL}/tickets`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        console.log("Fetched Tickets:", response.data); // Debugging: Log the response
         setSubmittedTasks(response.data); // Populate table with fetched tickets
       } catch (err) {
         console.error("Error fetching tickets:", err);
@@ -74,9 +73,8 @@ const Transactions = () => {
   const addServiceRow = () => setServices([...services, { name: "", amount: "" }]);
 
   // Calculate the total price of services
-  const calculateTotal = () => services.reduce(
-    (total, service) => total + (parseFloat(service.amount) || 0), 0
-  );
+  const calculateTotal = () =>
+    services.reduce((total, service) => total + (parseFloat(service.amount) || 0), 0);
 
   // Submit transaction to the backend
   const submitTransaction = async (taskId, client, phone) => {
@@ -87,20 +85,40 @@ const Transactions = () => {
       return;
     }
 
+    // Ensure all amounts are valid numbers
+    const isValidAmount = filteredServices.every((service) => !isNaN(parseFloat(service.amount))); // 🆕 Validates that service amounts are numeric
+    if (!isValidAmount) {
+      alert("Please enter valid numeric values for service amounts."); // 🆕 Alerts user if service amounts are not valid numbers
+      return;
+    }
+
+    // Log payload before sending
+    console.log("Submitting Ticket with Payload:", {
+      client_name: client,
+      client_phone: phone,
+      services: filteredServices.map((s) => ({
+        name: s.name,
+        price: parseFloat(s.amount), // 🆕 Ensure service amount is sent as a number
+      })),
+    });
+
     try {
-      const token = localStorage.getItem("authToken"); // Authorization token
+      const token = localStorage.getItem("authToken");
       const response = await axios.post(
-        `${API_URL}/tickets/create`,
+        `${API_URL}/tickets`,
         {
           client_name: client,
           client_phone: phone,
-          services: filteredServices,
+          services: filteredServices.map((s) => ({
+            name: s.name,
+            price: parseFloat(s.amount), // 🆕 Sending properly formatted service data to the backend
+          })),
         },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
       // Add the newly created ticket to the submittedTasks table
-      const { ticket_code, total_price } = response.data; // Extract relevant data from the response
+      const { ticket_code, total_price } = response.data;
       setSubmittedTasks((prev) => [
         ...prev,
         {
@@ -109,9 +127,9 @@ const Transactions = () => {
           phone,
           service_details: filteredServices
             .map((s) => `${s.name} (${s.amount})`)
-            .join(", "), // Join services into a single string
-          price: total_price, // Total price from backend
-          status: "Pending", // Default status
+            .join(", "),
+          price: total_price,
+          status: "Pending",
         },
       ]);
 
@@ -119,8 +137,8 @@ const Transactions = () => {
       setServices([{ name: "", amount: "" }]);
       alert("Ticket created successfully!");
     } catch (err) {
-      console.error("Error submitting transaction:", err);
-      alert("Failed to create ticket. Please try again.");
+      console.error("Error submitting transaction:", err); // 🆕 Log error details for debugging
+      alert("Failed to create ticket. Please try again."); // 🆕 Inform user of failure to submit ticket
     }
   };
 
