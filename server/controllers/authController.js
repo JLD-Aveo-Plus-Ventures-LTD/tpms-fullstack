@@ -14,9 +14,9 @@ const validateFields = (fields) => {
 
 // Register a new user (Admin Only)
 exports.createUser = async (req, res) => {
-  const { username, password, role } = req.body;
+  const { username, email, password, role } = req.body;
 
-  const validationError = validateFields({ username, password, role });
+  const validationError = validateFields({ username, email, password, role });
   if (validationError) {
     return res.status(400).json({ error: validationError });
   }
@@ -24,9 +24,9 @@ exports.createUser = async (req, res) => {
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
     const query =
-      "INSERT INTO users (username, password, role) VALUES (?, ?, ?)";
+      "INSERT INTO users (username, email, password, role) VALUES (?, ?, ?, ?)";
 
-    db.query(query, [username, hashedPassword, role], (err, result) => {
+    db.query(query, [username, email, hashedPassword, role], (err, result) => {
       if (err) {
         console.error("Error creating user:", err);
         return res.status(500).json({ error: "Failed to create user" });
@@ -39,32 +39,49 @@ exports.createUser = async (req, res) => {
   }
 };
 
+
 // Login an existing user
 exports.login = (req, res) => {
-  const { username, password } = req.body;
+  const { username, email, password } = req.body;
 
-  const validationError = validateFields({ username, password });
-  if (validationError) {
-    return res.status(400).json({ error: validationError });
-  }
+  console.log("Login Request:", { username, email }); // Debug: Log incoming request
 
-  const query = "SELECT * FROM users WHERE username = ?";
+  const query = username
+    ? "SELECT * FROM users WHERE username = ?"
+    : "SELECT * FROM users WHERE email = ?";
 
-  db.query(query, [username], async (err, results) => {
+  db.query(query, [username || email], async (err, results) => {
     if (err) {
-      console.error("Error fetching user for login:", err);
+      console.error("Database Error:", err);
       return res.status(500).json({ error: "Internal server error" });
     }
 
     const user = results[0];
-    if (user && (await bcrypt.compare(password, user.password))) {
-      const token = generateToken(user);
-      res.json({ token, role: user.role });
-    } else {
-      res.status(401).json({ error: "Invalid username or password" });
+    if (user) {
+      console.log("User Found:", user); // Debug log
+      const passwordMatch = await bcrypt.compare(password, user.password);
+
+      if (passwordMatch) {
+        // Transform 'operations' role to 'operator' for consistency
+        const transformedRole = user.role === "operations" ? "operator" : user.role;
+
+        // Generate a token with the transformed role
+        const token = generateToken({ ...user, role: transformedRole });
+
+        console.log("Generated Token:", token); // Debug
+        console.log("Role Sent to Frontend:", transformedRole);
+
+        return res.json({ token, role: transformedRole }); // Send transformed role
+      }
     }
+
+    console.warn("Invalid Credentials");
+    res.status(401).json({ error: "Invalid username/email or password" });
   });
 };
+
+
+
 
 // List all users (Admin Only)
 exports.getAllUsers = (req, res) => {
