@@ -156,3 +156,96 @@
   background-color: #16a34a;
   color: white;
 }
+/* Modal Styling */
+
+.modal {
+  display: none !important; /* Ensure hidden by default */
+  position: fixed !important; /* Fix to viewport */
+  top: 50% !important; /* Center vertically */
+  left: 50% !important; /* Center horizontally */
+  transform: translate(-50%, -50%) !important; /* Center both axes */
+  z-index: 1056 !important; /* Ensure it's above other elements */
+  background-color: #ffffff !important; /* Modal background */
+  border-radius: 10px !important; /* Smooth corners */
+  padding: 20px !important; /* Inner padding */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2) !important; /* Subtle shadow */
+  max-width: 600px !important; /* Increase width */
+  width: 90% !important; /* Responsive width */
+  max-height: 80% !important; /* Increase height */
+  overflow-y: auto !important; /* Scroll only if necessary */
+}
+
+/* Show modal when the 'show' class is applied */
+.modal.show {
+  display: block !important;
+}
+
+/* Modal overlay for dimming the background */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5); /* Semi-transparent black overlay */
+  z-index: 999; /* Below the modal */
+}
+
+/* Modal content layout */
+.modal-content {
+  display: flex;
+  flex-direction: column; /* Stack elements vertically */
+  gap: 10px; /* Space between elements */
+  max-height: calc(100% - 40px); /* Allow modal content to fit within modal */
+}
+
+/* Form group spacing */
+.modal .form-group {
+  margin-bottom: 15px; /* Space between form elements */
+}
+
+/* Input fields and dropdowns */
+.modal input,
+.modal select,
+.modal textarea {
+  width: 100%; /* Full width inside modal */
+  padding: 10px; /* Inner padding */
+  border: 1px solid #ccc; /* Light gray border */
+  border-radius: 5px; /* Rounded corners */
+  font-size: 1rem; /* Consistent text size */
+  resize: none; /* Prevent textarea resizing */
+}
+
+/* Primary button (Submit) */
+.modal .btn-primary {
+  background-color: #16a34a; /* Green background */
+  color: white; /* White text */
+  border: none;
+  padding: 12px; /* Slightly larger padding for better usability */
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  text-align: center;
+}
+
+/* Primary button hover effect */
+.modal .btn-primary:hover {
+  background-color: #1f9f3f; /* Darker green */
+}
+
+/* Secondary button (Cancel) */
+.modal .btn-secondary {
+  background-color: white; /* White background */
+  color: #555; /* Gray text */
+  border: 1px solid #ccc;
+  padding: 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  text-align: center;
+}
+
+/* Secondary button hover effect */
+.modal .btn-secondary:hover {
+  background-color: #f1f1f1; /* Light gray */
+}
