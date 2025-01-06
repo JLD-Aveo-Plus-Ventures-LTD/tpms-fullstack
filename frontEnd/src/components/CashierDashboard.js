@@ -25,6 +25,9 @@ const Transactions = () => {
     discrepancyReason: "",
   });
 
+  // Active tab state
+  const [activeTab, setActiveTab] = useState("Incoming");
+
   // Update the current time every second
   useEffect(() => {
     const updateCurrentTime = () => {
@@ -77,41 +80,42 @@ const Transactions = () => {
   const submitApproval = async () => {
     const { amount, paymentMethod, discrepancyReason } = formData;
     const expectedAmount = parseFloat(selectedTransaction.price.replace(",", ""));
-
+  
     // Validate form inputs
     if (!amount || !paymentMethod) {
       alert("Please fill in all required fields.");
       return;
     }
-
+  
     const numericAmount = parseFloat(amount);
-
+  
     if (isNaN(numericAmount)) {
       alert("Please enter a valid numeric amount.");
       return;
     }
-
+  
     // Require discrepancy reason if amounts don't match
-    if (numericAmount !== expectedAmount && !discrepancyReason) {
+    const isDiscrepancy = numericAmount !== expectedAmount;
+    if (isDiscrepancy && !discrepancyReason) {
       alert("Please provide a reason for the discrepancy.");
       return;
     }
-
+  
     try {
       const token = localStorage.getItem("authToken");
       await axios.post(
         `${API_URL}/payments`,
         {
-          ticket_id: selectedTransaction.ticket_code,
+          ticket_id: selectedTransaction.ticket_id, // Use ticket_id to match backend expectation
           amount: numericAmount,
           payment_method: paymentMethod,
-          discrepancy_reason: numericAmount === expectedAmount ? null : discrepancyReason,
+          discrepancy_reason: isDiscrepancy ? discrepancyReason : null, // Include discrepancy_reason only if needed
         },
         {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-
+  
       alert("Payment submitted successfully!");
       setShowModal(false); // Close modal
       setSelectedTransaction(null); // Clear selection
@@ -121,6 +125,20 @@ const Transactions = () => {
       alert("Failed to submit payment. Please try again.");
     }
   };
+  
+  
+
+  // Filter transactions based on active tab
+  const filteredTransactions = transactions.filter((transaction) => {
+    if (activeTab === "Incoming") {
+      return transaction.status === "Pending";
+    } else if (activeTab === "Approved") {
+      return transaction.status === "Completed";
+    } else if (activeTab === "Suspended") {
+      return transaction.status === "Discrepancy";
+    }
+    return false;
+  });
 
   return (
     <div className="transactions-container">
@@ -129,7 +147,7 @@ const Transactions = () => {
         {/* Header Section */}
         <header className="header">
           <h6>
-            Transaction &gt; <span className="activeStatus"> Incoming </span>
+            Transaction &gt; <span className="activeStatus">{activeTab}</span>
           </h6>
           <div className="time-display">
             <span>Time:</span>
@@ -147,11 +165,26 @@ const Transactions = () => {
           <i className="fas fa-search"></i>
         </div>
 
-        {/* Tabs (Non-functional) */}
+        {/* Tabs for filtering */}
         <div className="tabs">
-          <p className="active-tab">Incoming</p>
-          <p>Approved</p>
-          <p>Suspended</p>
+          <p
+            className={`tab ${activeTab === "Incoming" ? "active-tab" : ""}`}
+            onClick={() => setActiveTab("Incoming")}
+          >
+            Incoming
+          </p>
+          <p
+            className={`tab ${activeTab === "Approved" ? "active-tab" : ""}`}
+            onClick={() => setActiveTab("Approved")}
+          >
+            Approved
+          </p>
+          <p
+            className={`tab ${activeTab === "Suspended" ? "active-tab" : ""}`}
+            onClick={() => setActiveTab("Suspended")}
+          >
+            Suspended
+          </p>
         </div>
 
         {/* Transactions Table */}
@@ -168,7 +201,7 @@ const Transactions = () => {
               </tr>
             </thead>
             <tbody>
-              {transactions.map((transaction, index) => (
+              {filteredTransactions.map((transaction, index) => (
                 <tr key={index}>
                   <td>{transaction.client_name}</td>
                   <td>{transaction.ticket_code}</td>
@@ -176,12 +209,14 @@ const Transactions = () => {
                   <td>{transaction.service_details}</td>
                   <td>{transaction.price}</td>
                   <td>
-                    <button
-                      className="approve-btn"
-                      onClick={() => handleApprove(transaction)}
-                    >
-                      Approve
-                    </button>
+                    {activeTab === "Incoming" && (
+                      <button
+                        className="approve-btn"
+                        onClick={() => handleApprove(transaction)}
+                      >
+                        Approve
+                      </button>
+                    )}
                     <button className="suspend-btn">Suspend</button>
                   </td>
                 </tr>

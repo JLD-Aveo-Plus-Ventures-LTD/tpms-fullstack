@@ -1,12 +1,13 @@
 const db = require('../config/db');
 
 exports.createPayment = (req, res) => {
-  const { ticket_id, amount, payment_method, discrepancy_reason } = req.body;
+  const { ticket_id, amount, payment_method, discrepancy_reason } = req.body; // Use ticket_id from the request body
 
   if (!ticket_id) {
-    return res.status(400).json({ error: "ticket_id is required" });
+    return res.status(400).json({ error: "ticket_id is required" }); // Validate for ticket_id
   }
 
+  // Query using ticket_id instead of ticket_code
   db.query('SELECT * FROM tickets WHERE ticket_id = ?', [ticket_id], (err, ticketResults) => {
     if (err) {
       console.error("Error fetching ticket from database:", err);
@@ -22,7 +23,7 @@ exports.createPayment = (req, res) => {
     const isExactAmount = parseFloat(amount) === parseFloat(ticket.price);
 
     const paymentData = {
-      ticket_id,
+      ticket_id, // Use the ticket_id directly
       amount,
       payment_method,
       status: isExactAmount ? 'Success' : 'Discrepancy',
@@ -54,6 +55,9 @@ exports.createPayment = (req, res) => {
     });
   });
 };
+
+
+
 
 
 // Get all payments (Cashier Only)
