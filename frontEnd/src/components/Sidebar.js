@@ -6,8 +6,8 @@ export default function Sidebar() {
   const navigate = useNavigate(); // Added: Hook for redirecting users to the login page after logout.
 
   // Logout Functionality
-  const handleLogout = () => {
-    // Clear localStorage
+  const handleLogout = (e) => {
+    e.preventDefault(); // Prevent default anchor behavior to handle it programmatically
     localStorage.removeItem("authToken"); // Added: Removes the user's authentication token from localStorage.
     localStorage.removeItem("userRole"); // Added: Removes the user's role from localStorage.
 
@@ -82,10 +82,10 @@ export default function Sidebar() {
           </div>
         </div>
         <div className="sidebar-signout">
-          {/* Changed from <a> to <button> for accessibility and to attach logout logic */}
-          <button onClick={handleLogout} className="signout-link">
+          {/* Using an <a> tag with onClick handler for logout functionality */}
+          <a href="/" onClick={handleLogout} className="signout-link">
             Sign out <i className="fas fa-sign-out-alt"></i>
-          </button>
+          </a>
         </div>
       </div>
     </div>

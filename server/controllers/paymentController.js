@@ -57,9 +57,6 @@ exports.createPayment = (req, res) => {
 };
 
 
-
-
-
 // Get all payments (Cashier Only)
 exports.getAllPayments = (req, res) => {
   db.query('SELECT * FROM payments', (err, results) => {

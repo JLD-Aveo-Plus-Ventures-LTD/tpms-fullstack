@@ -1,7 +1,16 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom"; // Import `useNavigate` for navigation
 import "./Sidebar.css";
 
 const CashierSideBar = () => {
+  const navigate = useNavigate(); // Hook for programmatic navigation
+
+  // Function to handle sign out
+  const handleSignOut = (e) => {
+    e.preventDefault(); // Prevent default anchor behavior
+    localStorage.removeItem("authToken"); // Clear the auth token
+    navigate("/"); // Redirect to the login page
+  };
+
   return (
     <div className="sidebar">
       <div className="sidebar-logo">
@@ -16,7 +25,7 @@ const CashierSideBar = () => {
             {/* Transaction Menu */}
             <li>
               <a
-                className="nav-link  transaction-nav"
+                className="nav-link transaction-nav"
                 href="#transaction"
                 role="button"
                 data-bs-toggle="collapse"
@@ -64,14 +73,14 @@ const CashierSideBar = () => {
           </div>
         </div>
         <div className="sidebar-signout">
-          <Link to="/">
-            <a href="#signout" className="signout-link">
-              Sign out <i className="fas fa-sign-out-alt"></i>
-            </a>
-          </Link>
+          {/* Using an <a> tag with onClick handler */}
+          <a href="/" onClick={handleSignOut} className="signout-link">
+            Sign out <i className="fas fa-sign-out-alt"></i>
+          </a>
         </div>
       </div>
     </div>
   );
 };
+
 export default CashierSideBar;
