@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import "./Sidebar.css";
+import "../stylings/Sidebar.css";
 
 const CashierSideBar = () => {
   return (
@@ -14,7 +14,7 @@ const CashierSideBar = () => {
         <div className="container-fluid">
           <ul className="navbar-nav sidebar-menu">
             {/* Transaction Menu */}
-            <li>
+            <li className="nav-item">
               <a
                 className="nav-link  transaction-nav"
                 href="#transaction"
@@ -26,23 +26,28 @@ const CashierSideBar = () => {
                 Transaction <span className="dropdown-arrow">&gt;</span>
               </a>
 
-              {/* Task Menu */}
+              {/* Transaction Submenu */}
               <div className="collapse" id="transactionMenu">
                 <ul className="navbar-nav">
                   <li className="nav-item">
-                    <a className="dropdown-item" href="#tasks">
+                    <Link to="/CashierIncoming" className="dropdown-item">
                       Incoming
-                    </a>
+                    </Link>
                   </li>
                   <li className="nav-item">
-                    <a className="dropdown-item" href="#status">
+                    <Link to="/Transactions" className="dropdown-item">
                       Approved
-                    </a>
+                    </Link>
                   </li>
                   <li className="nav-item">
-                    <a className="dropdown-item" href="#suspended">
+                    <Link to="/CashierSuspended" className="dropdown-item">
                       Suspended
-                    </a>
+                    </Link>
+                  </li>
+                  <li className="nav-item">
+                    <Link to="/Transactions" className="dropdown-item">
+                      Queried
+                    </Link>
                   </li>
                 </ul>
               </div>
@@ -64,14 +69,13 @@ const CashierSideBar = () => {
           </div>
         </div>
         <div className="sidebar-signout">
-          <Link to="/">
-            <a href="#signout" className="signout-link">
-              Sign out <i className="fas fa-sign-out-alt"></i>
-            </a>
+          <Link to="/" className="signout-link">
+            Sign out <i className="fas fa-sign-out-alt"></i>
           </Link>
         </div>
       </div>
     </div>
   );
 };
+
 export default CashierSideBar;

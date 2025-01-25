@@ -8,6 +8,11 @@
   margin-top: 3px;
 }
 
+/* .cashierpage {
+  text-decoration: none;
+  color: inherit;
+} */
+
 /* Search Bar with Icon */
 .search-bar {
   position: relative;
@@ -48,10 +53,22 @@
   display: flex;
   color: #555;
   cursor: pointer;
+  border-bottom: 1px solid #ddd;
 }
 .tabs p {
   margin: 10px 20px -5px 0;
   padding-bottom: 5px;
+  position: relative;
+  font-size: 1 rem;
+  color: #555;
+}
+.tabs a {
+  text-decoration: none; /* Removes the underline */
+  color: inherit; /* Ensures the text color matches your design */
+}
+
+.tabs a:hover {
+  text-decoration: none; /* Ensures underline doesn't appear on hover */
 }
 
 .tabs .active-tab {
@@ -59,6 +76,10 @@
   border-bottom: 3px solid #029447;
 }
 
+.tabs p:hover,
+.cashierpage:hover {
+  color: #029447;
+}
 /* Transactions Table */
 .transactions-table {
   margin: 20px 0;
@@ -69,6 +90,7 @@
 
 .transactions-table table {
   width: 100%;
+  table-layout: auto;
   border-collapse: collapse;
 }
 
@@ -87,39 +109,7 @@
 
 .transactions-table td {
   background-color: white;
-}
-
-/* Approve Button */
-.transactions-table .approve-btn {
-  background-color: white;
-  color: #16a34a;
-  border: 2px solid #16a34a;
-  padding: 3px 10px;
-  margin-right: 3px;
-  border-radius: 15px;
-  cursor: pointer;
-  width: 100px;
-}
-
-.transactions-table .approve-btn:hover {
-  background-color: #16a34a;
-  color: white;
-}
-
-/* Suspend Button */
-.transactions-table .suspend-btn {
-  background-color: white;
-  color: #e3342f;
-  border: 2px solid #e3342f;
-  padding: 3px 10px;
-  border-radius: 15px;
-  cursor: pointer;
-  width: 100px;
-}
-
-.transactions-table .suspend-btn:hover {
-  background-color: #e3342f;
-  color: white;
+  white-space: nowrap;
 }
 
 /* Pagination */
@@ -154,5 +144,40 @@
 
 .pagination .active-page {
   background-color: #16a34a;
+  color: white;
+}
+
+.transactions-table .btn-action {
+  display: inline-block;
+  padding: 5px 10px;
+  margin-right: 5px;
+  border-radius: 5px;
+  font-size: 0.9rem;
+  color: white;
+  cursor: pointer;
+}
+.transactions-table .btn-action.approve,
+.transactions-table td.cashier-approved {
+  background-color: #16a34a;
+}
+.transactions-table .btn-action.suspend,
+.transactions-table td.cashier-suspend {
+  background-color: #ff9900;
+}
+.transactions-table .btn-action.query,
+.transactions-table td.cashier-query {
+  background-color: #e3342f;
+}
+
+.transactions-table td.cashier-approved,
+.transactions-table td.cashier-suspend,
+.transactions-table td.cashier-query {
+  display: inline-block;
+  padding: 5px 10px;
+  margin-right: 5px;
+  border-radius: 5px;
+  font-size: 0.9rem;
+  margin-bottom: -15px;
+
   color: white;
 }

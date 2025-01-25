@@ -1,16 +1,26 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css";
-import LoginPage from "./components/LoginPage";
-import ForgetPassword from "./components/ForgetPassword";
-import OperatorDashboard from "./components/OperatorDashboard";
-import CashierDashboard from "./components/CashierDashboard";
-import Transactions from "./components/Transactions";
+import LoginPage from "./components/pages/LoginPage";
+import ForgetPassword from "./components/pages/ForgetPassword";
+import OperatorDashboard from "./components/pages/OperatorDashboard";
+/* import CashierDashboard from "./components/pages/CashierDashboard";
+ */ import CashierIncoming from "./components/pages/CashierIncoming";
+import CashierApproved from "./components/pages/CashierApproved";
+import CashierSuspended from "./components/pages/CashierSuspended";
+import CashierQueried from "./components/pages/CashierQueried";
+import Transactions from "./components/pages/Transactions";
+
+import CashierHeader from "./components/pages/CashierHeader";
+import AllTransactions from "./components/pages/AllTransactions";
+import { TransactionsProvider } from "./components/pages/TransactionsContext";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import "@fortawesome/fontawesome-free/css/all.min.css";
-import RoleProtectedRoute from "./components/RoleProtectedRoute";
+import TransactionApproved from "./components/pages/TransactionApproved";
+import TransactionSuspended from "./components/pages/TransactionSuspended";
+import TransactionQueried from "./components/pages/TransactionQueried";
 
 const router = createBrowserRouter([
   {
@@ -23,23 +33,52 @@ const router = createBrowserRouter([
   },
   {
     path: "/OperatorDashboard",
-    element: (
-      <RoleProtectedRoute role="operator">
-        <OperatorDashboard />
-      </RoleProtectedRoute>
-    ),
+    element: <OperatorDashboard />,
   },
-  {
+  /* {
     path: "/CashierDashboard",
-    element: (
-      <RoleProtectedRoute role="cashier">
-        <CashierDashboard />
-      </RoleProtectedRoute>
-    ),
-  },
+    element: <CashierDashboard />,
+  }, */
   {
     path: "/Transactions",
     element: <Transactions />,
+  },
+  {
+    path: "/CashierIncoming",
+    element: <CashierIncoming />,
+  },
+  {
+    path: "/CashierApproved",
+    element: <CashierApproved />,
+  },
+  {
+    path: "/CashierSuspended",
+    element: <CashierSuspended />,
+  },
+
+  {
+    path: "/CashierHeader",
+    element: <CashierHeader />,
+  },
+  {
+    path: "/CashierQueried",
+    element: <CashierQueried />,
+  },
+  {
+    path: "/AllTransactions",
+    element: <AllTransactions />,
+  },
+  {
+    path: "/TransactionApproved",
+    element: <TransactionApproved />,
+  },
+  {
+    path: "/TransactionSuspended",
+    element: <TransactionSuspended />,
+  },
+  {
+    path: "/TransactionQueried",
+    element: <TransactionQueried />,
   },
   {
     path: "*",
@@ -50,6 +89,8 @@ const router = createBrowserRouter([
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
-    <RouterProvider router={router} />
+    <TransactionsProvider>
+      <RouterProvider router={router} />
+    </TransactionsProvider>
   </React.StrictMode>
 );

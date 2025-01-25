@@ -1,20 +1,8 @@
 import React from "react";
-import "./Sidebar.css";
-import { Link, useNavigate } from "react-router-dom"; // Added: Imported `useNavigate` for programmatic navigation after logout.
+import "../stylings/Sidebar.css";
+import { Link } from "react-router-dom";
 
 export default function Sidebar() {
-  const navigate = useNavigate(); // Added: Hook for redirecting users to the login page after logout.
-
-  // Logout Functionality
-  const handleLogout = () => {
-    // Clear localStorage
-    localStorage.removeItem("authToken"); // Added: Removes the user's authentication token from localStorage.
-    localStorage.removeItem("userRole"); // Added: Removes the user's role from localStorage.
-
-    // Redirect to login page
-    navigate("/"); // Added: Redirects the user to the login page.
-  };
-
   return (
     <div className="sidebar">
       <div className="sidebar-logo">
@@ -29,7 +17,7 @@ export default function Sidebar() {
             {/* Transaction Menu */}
             <li className="nav-item">
               <a
-                className="nav-link transaction-nav"
+                className="nav-link  transaction-nav"
                 href="#transaction"
                 role="button"
                 data-bs-toggle="collapse"
@@ -43,24 +31,29 @@ export default function Sidebar() {
               <div className="collapse" id="transactionMenu">
                 <ul className="navbar-nav">
                   <li className="nav-item">
-                    <a className="dropdown-item" href="#tasks">
-                      Tasks
-                    </a>
+                    {/* Link "All" to Transactions */}
+                    <Link className="dropdown-item" to="/Transactions">
+                      All
+                    </Link>
+                  </li>
+
+                  <li className="nav-item">
+                    {/* Link "All" to AllTransactions */}
+                    <Link className="dropdown-item" to="/TransactionApproved">
+                      Approved
+                    </Link>
                   </li>
                   <li className="nav-item">
-                    <a className="dropdown-item" href="#status">
-                      Status
-                    </a>
-                  </li>
-                  <li className="nav-item">
-                    <a className="dropdown-item" href="#suspended">
+                    {/* Link "All" to AllTransactions */}
+                    <Link className="dropdown-item" to="/TransactionSuspended">
                       Suspended
-                    </a>
+                    </Link>
                   </li>
                   <li className="nav-item">
-                    <a className="dropdown-item" href="#query">
+                    {/* Link "All" to AllTransactions */}
+                    <Link className="dropdown-item" to="/CashierIncoming">
                       Query
-                    </a>
+                    </Link>
                   </li>
                 </ul>
               </div>
@@ -82,10 +75,11 @@ export default function Sidebar() {
           </div>
         </div>
         <div className="sidebar-signout">
-          {/* Changed from <a> to <button> for accessibility and to attach logout logic */}
-          <button onClick={handleLogout} className="signout-link">
-            Sign out <i className="fas fa-sign-out-alt"></i>
-          </button>
+          <Link to="/">
+            <a href="#signout" className="signout-link">
+              Sign out <i className="fas fa-sign-out-alt"></i>
+            </a>
+          </Link>
         </div>
       </div>
     </div>
