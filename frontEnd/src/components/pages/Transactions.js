@@ -66,31 +66,28 @@ const Transactions = () => {
       return;
     }
 
-    const currentTask = tasks[0]; // Use the current task ID from the first card
+    const currentTask = tasks[0];
 
     const newPendingTask = {
       client,
-      taskId: currentTask.taskId, // Use the current task ID
+      taskId: currentTask.taskId,
       phone,
       services: servicesSummary,
       amount: totalAmount,
       status: "Pending",
     };
 
-    // Add the task to the pendingTasks table
     setPendingTasks([...pendingTasks, newPendingTask]);
 
-    // Reset the current task with a new ID and clear the form
     setTasks((prevTasks) => [
       {
         ...prevTasks[0],
-        taskId: generateTaskId(), // Generate a new task ID
+        taskId: generateTaskId(),
         client: "",
         phone: "",
       },
     ]);
 
-    // Reset services for the new task
     setServices([{ name: "", amount: "" }]);
   };
 
@@ -308,7 +305,6 @@ const Transactions = () => {
           Add Task
         </button>
 
-        {/* Render Pending Tasks Table */}
         <div>
           <table>
             <thead>

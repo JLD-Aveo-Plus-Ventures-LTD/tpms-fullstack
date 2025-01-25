@@ -63,12 +63,12 @@
   color: #555;
 }
 .tabs a {
-  text-decoration: none; /* Removes the underline */
-  color: inherit; /* Ensures the text color matches your design */
+  text-decoration: none;
+  color: inherit;
 }
 
 .tabs a:hover {
-  text-decoration: none; /* Ensures underline doesn't appear on hover */
+  text-decoration: none;
 }
 
 .tabs .active-tab {

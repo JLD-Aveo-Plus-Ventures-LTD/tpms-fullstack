@@ -22,9 +22,9 @@ export const TransactionsProvider = ({ children }) => {
           } else if (status === "Queried") {
             setQueriedTasks((prev) => [...prev, updatedTask]);
           }
-          return false; // Remove the task with this taskId from pending tasks
+          return false;
         }
-        return true; // Retain all other tasks
+        return true;
       })
     );
   };

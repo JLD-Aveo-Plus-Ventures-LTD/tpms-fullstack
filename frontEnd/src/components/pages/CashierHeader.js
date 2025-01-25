@@ -5,7 +5,7 @@ import "../stylings/CashierDashboard.css";
 const CashierHeader = () => {
   const [currentTime, setCurrentTime] = useState("");
   const location = useLocation();
-  const currentTab = location.pathname.split("/")[1]; // Determine active tab from route
+  const currentTab = location.pathname.split("/")[1];
 
   useEffect(() => {
     const updateCurrentTime = () => {

@@ -1,6 +1,6 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
-import "../stylings/Transactions.css"; // Ensure the styling file is included
+import "../stylings/Transactions.css";
 import "../stylings/CashierDashboard.css";
 
 const CashierMenu = () => {

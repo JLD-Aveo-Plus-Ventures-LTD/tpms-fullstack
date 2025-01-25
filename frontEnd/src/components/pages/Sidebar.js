@@ -31,26 +31,22 @@ export default function Sidebar() {
               <div className="collapse" id="transactionMenu">
                 <ul className="navbar-nav">
                   <li className="nav-item">
-                    {/* Link "All" to Transactions */}
                     <Link className="dropdown-item" to="/Transactions">
                       All
                     </Link>
                   </li>
 
                   <li className="nav-item">
-                    {/* Link "All" to AllTransactions */}
                     <Link className="dropdown-item" to="/TransactionApproved">
                       Approved
                     </Link>
                   </li>
                   <li className="nav-item">
-                    {/* Link "All" to AllTransactions */}
                     <Link className="dropdown-item" to="/TransactionSuspended">
                       Suspended
                     </Link>
                   </li>
                   <li className="nav-item">
-                    {/* Link "All" to AllTransactions */}
                     <Link className="dropdown-item" to="/CashierIncoming">
                       Query
                     </Link>
