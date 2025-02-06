@@ -38,26 +38,35 @@ const Transactions = () => {
         const response = await axios.get(`${API_URL}/tickets`, {
           headers: { Authorization: `Bearer ${token}` }, // Include the token in the request headers
         });
-
+  
         // Map the backend response to the frontend's expected structure
         const formattedTasks = response.data.map((task) => ({
-          client: task.client_name || "N/A", // Map client_name to client
-          taskId: task.ticket_code || "N/A", // Map ticket_code to taskId
-          phone: task.client_phone || "N/A", // Map client_phone to phone
-          services: task.service_details || "N/A", // Map service_details to services
-          amount: task.price ? `₦${task.price}` : "N/A", // Format price as currency
-          status: task.status || "N/A", // Keep status as is
+          client: task.client_name || "N/A",
+          taskId: task.ticket_code || "N/A",
+          phone: task.client_phone || "N/A",
+          services: task.service_details || "N/A",
+          amount: task.price ? `₦${task.price}` : "N/A",
+          status: task.status || "N/A",
+          date: task.created_at || new Date().toISOString(), // Ensure a valid date field
         }));
-
-        setPendingTasks(formattedTasks); // Update the state with formatted tasks
+  
+        //  Fix: Reverse the last 5 transactions to show the newest first
+        const sortedTasks = formattedTasks
+          .sort((a, b) => new Date(b.date) - new Date(a.date)) // Sort by date descending
+          .slice(-5) // Get the last 5 transactions
+          .reverse(); // Reverse the last 5 transactions so the newest is first
+  
+        setPendingTasks(sortedTasks); // Update state with the latest 5 tickets
       } catch (error) {
         console.error("Error fetching tasks:", error);
         alert("Failed to fetch tasks. Please try again.");
       }
     };
-
+  
     fetchPendingTasks();
   }, []);
+  
+  
 
   // Effect to update the current time every second
   useEffect(() => {
@@ -135,9 +144,13 @@ const Transactions = () => {
         services: filteredServices.map((s) => s.name).join(", "), // Join services for display
         amount: response.data.total_price, // Use the total_price from the backend
         status: "Pending",
+        date: new Date().toISOString(), // Add a date field for sorting
       };
 
-      setPendingTasks([...pendingTasks, newTask]); // Add the new task to the pending tasks list
+      // Add the new task to the top of the list and limit to the last 5 transactions
+      const updatedTasks = [newTask, ...pendingTasks].slice(0, 5);
+
+      setPendingTasks(updatedTasks); // Update the state with the new task list
 
       // Reset the form for the next task
       setTasks((prevTasks) => [
