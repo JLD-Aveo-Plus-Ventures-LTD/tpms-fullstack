@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import API_URL from "../../config";
+import { loginUser } from "../../services/apiService"; // Using the API service for login
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -13,45 +13,47 @@ export default function LoginPage() {
   const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
-
-    // Basic validation
+  
     if (!email || !password) {
       setError("Please fill in all fields.");
       return;
     }
-
+  
     setLoading(true);
-
+  
     try {
-      // Send request to backend
-      const response = await fetch(`${API_URL}/auth/login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await response.json();
-      setLoading(false);
-
-      if (response.ok) {
-        // Redirect based on user role
-        if (data.role === "cashier") {
-          navigate("/CashierIncoming");
-        } else if (data.role === "operator") {
-          navigate("/OperatorDashboard");
-        } else {
-          setError("Unexpected role received. Please contact support.");
-        }
+      const response = await loginUser(email, password);
+  
+      console.log("Full API Response:", response); // Debug full response
+      console.log("Extracted Role:", response?.data?.role); // Fix role extraction
+  
+      const { token, role } = response.data; // Correct way to extract role
+  
+      if (!role) {
+        setError("Received undefined role. Please contact support.");
+        return;
+      }
+  
+      localStorage.setItem("authToken", token);
+      localStorage.setItem("userRole", role);
+  
+      if (role === "cashier") {
+        navigate("/CashierIncoming");
+      } else if (role === "operator") {
+        navigate("/OperatorDashboard");
       } else {
-        setError(data.message || "Login failed.");
+        console.error("Unhandled role received:", role);
+        setError("Unexpected role received. Please contact support.");
       }
     } catch (err) {
+      setError(err.message || "An error occurred. Please try again.");
+    } finally {
       setLoading(false);
-      setError("An error occurred. Please try again.");
     }
   };
+  
+  
+  
 
   return (
     <div className="loginWrapper">
