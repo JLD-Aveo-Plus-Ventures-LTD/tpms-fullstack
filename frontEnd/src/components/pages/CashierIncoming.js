@@ -1,26 +1,129 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import CashierSideBar from "./CashierSideBar";
-import CashierHeader from "./CashierHeader";
-import CashierMenu from "./CashierMenu";
-import { useTransactions } from "./TransactionsContext";
 import "../stylings/Transactions.css";
 import "../stylings/CashierDashboard.css";
+import { useTransactions } from "./TransactionsContext";
+import axios from "axios";
+import API_URL from "../../config";
 
 const CashierIncoming = () => {
-  const { pendingTasks, handleProcess } = useTransactions();
+  const { pendingTasks } = useTransactions();
+  const [currentTime, setCurrentTime] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [activeTab, setActiveTab] = useState("Incoming");
+  const [showModal, setShowModal] = useState(false);
+  const [selectedTask, setSelectedTask] = useState(null);
+  const [formData, setFormData] = useState({
+    amount: "",
+    paymentMethod: "Cash",
+    discrepancyReason: "",
+  });
+
+  // Update the current time every second
+  useEffect(() => {
+    const updateTime = () => {
+      const now = new Date();
+      setCurrentTime(now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }));
+    };
+
+    const interval = setInterval(updateTime, 1000);
+    updateTime();
+    return () => clearInterval(interval);
+  }, []);
+
+  // Open modal and set the selected transaction
+  const handleOpenModal = (task) => {
+    console.log("Opening Modal for Task:", task);
+    setSelectedTask(task);
+    setShowModal(true);
+    setFormData({
+      amount: "",
+      paymentMethod: "Cash",
+      discrepancyReason: "",
+    });
+  };
+
+  // Handle input changes in the modal
+  const handleInputChange = (field, value) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  // Process payment function
+  const processPayment = async (status) => {
+    const { amount, paymentMethod, discrepancyReason } = formData;
+
+    // Extract price safely (Ensure it exists)
+    const expectedAmount = parseFloat((selectedTask?.amount || selectedTask?.price || "0").replace("₦", "").replace(",", ""));
+    const numericAmount = parseFloat(amount);
+
+    if (!numericAmount || !paymentMethod) {
+      alert("Please enter the amount and select a payment method.");
+      return;
+    }
+
+    if (isNaN(numericAmount)) {
+      alert("Please enter a valid numeric amount.");
+      return;
+    }
+
+    const isDiscrepancy = numericAmount !== expectedAmount;
+
+    if (isDiscrepancy && !discrepancyReason) {
+      alert("Please provide a reason for the discrepancy.");
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem("authToken");
+      await axios.post(
+        `${API_URL}/payments`,
+        {
+          ticket_id: selectedTask?.ticket_id,
+          amount: numericAmount,
+          payment_method: paymentMethod,
+          discrepancy_reason: isDiscrepancy ? discrepancyReason : null,
+          status,
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      alert("Payment submitted successfully!");
+      setShowModal(false);
+      setSelectedTask(null);
+      setFormData({ amount: "", paymentMethod: "Cash", discrepancyReason: "" });
+    } catch (err) {
+      console.error("Error submitting payment:", err);
+      alert("Failed to submit payment. Please try again.");
+    }
+  };
 
   return (
     <div className="transactions-container">
       <CashierSideBar />
       <div className="transactions-content">
-        <CashierHeader />
-        <h2>Incoming Transactions</h2>
+        {/* Header */}
+        <header className="header">
+          <h6>Transaction &gt; <span className="activeStatus">{activeTab}</span></h6>
+          <div className="time-display"><span>Time:</span> {currentTime}</div>
+          <div className="notification-bell"><i className="fas fa-bell"></i></div>
+        </header>
+
+        <h2>Tasks</h2>
+
         {/* Search Bar */}
         <div className="search-bar">
-          <input type="text" placeholder="Enter name or task ID" />
+          <input
+            type="text"
+            placeholder="Enter name or task ID"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
           <i className="fas fa-search"></i>
         </div>
-        <CashierMenu />
+
+        {/* Transactions Table */}
         <div className="transactions-table">
           <table>
             <thead>
@@ -28,55 +131,90 @@ const CashierIncoming = () => {
                 <th>Name</th>
                 <th>Task ID</th>
                 <th>Phone Number</th>
-                <th>Services</th>
+                <th>Description</th>
                 <th>Amount</th>
                 <th>Actions</th>
               </tr>
             </thead>
             <tbody>
-              {pendingTasks.map((task, index) => (
-                <tr key={index}>
-                  <td>{task.client}</td>
-                  <td>{task.taskId}</td>
-                  <td>{task.phone}</td>
-                  <td>{task.services}</td>
-                  <td>{task.amount}</td>
-                  <td>
-                    <button
-                      className="btn-action approve"
-                      onClick={() => handleProcess(task.taskId, "Approved")}
-                    >
-                      Approve
-                    </button>
-                    <button
-                      className="btn-action suspend"
-                      onClick={() => handleProcess(task.taskId, "Suspended")}
-                    >
-                      Suspend
-                    </button>
-                    <button
-                      className="btn-action query"
-                      onClick={() => handleProcess(task.taskId, "Queried")}
-                    >
-                      Query
-                    </button>
-                  </td>
+              {pendingTasks.length > 0 ? (
+                pendingTasks.map((task, index) => (
+                  <tr key={index}>
+                    <td>{task.client_name || task.client}</td>
+                    <td>{task.taskId || task.ticket_code}</td>
+                    <td>{task.client_phone || task.phone}</td>
+                    <td>{task.service_details || task.services}</td>
+                    <td>{task.amount || task.price}</td>
+                    <td>
+                      <button className="btn-process" onClick={() => handleOpenModal(task)}>
+                        Process Payment
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="6" className="no-data">No transactions available</td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         </div>
-        {/* Pagination */}
-        <div className="pagination">
-          <button>&laquo;</button>
-          <button className="active-page">1</button>
-          <button>2</button>
-          <button>3</button>
-          <button>4</button>
-          <button>...</button>
-          <button>10</button>
-          <button>&raquo;</button>
-        </div>
+
+        {/* Payment Modal */}
+        {showModal && selectedTask && (
+          <>
+            {/* Dark overlay */}
+            <div className="modal-overlay" onClick={() => setShowModal(false)}></div>
+
+            <div className="modal show">
+              <div className="modal-content">
+                <h3>Processing Payment for {selectedTask.taskId || selectedTask.ticket_code || "Unknown Ticket"}</h3>
+
+                <div className="form-group">
+                  <label>Amount Received:</label>
+                  <input
+                    type="number"
+                    value={formData.amount}
+                    onChange={(e) => handleInputChange("amount", e.target.value)}
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>Payment Method:</label>
+                  <select
+                    value={formData.paymentMethod}
+                    onChange={(e) => handleInputChange("paymentMethod", e.target.value)}
+                  >
+                    <option value="Cash">Cash</option>
+                    <option value="POS">POS</option>
+                    <option value="Transfer">Transfer</option>
+                  </select>
+                </div>
+
+                {/* Show discrepancy reason only when amount mismatches */}
+                {formData.amount &&
+                  selectedTask?.amount &&
+                  parseFloat(formData.amount) !== parseFloat((selectedTask.amount || selectedTask.price).replace("₦", "").replace(",", "")) && (
+                    <div className="form-group">
+                      <label>Reason for Discrepancy:</label>
+                      <textarea
+                        value={formData.discrepancyReason}
+                        onChange={(e) => handleInputChange("discrepancyReason", e.target.value)}
+                        placeholder="Enter reason for discrepancy"
+                      />
+                    </div>
+                )}
+
+                <div className="modal-actions">
+                  <button className="btn-success" onClick={() => processPayment("Approved")}>Approve Payment</button>
+                  <button className="btn-danger" onClick={() => processPayment("Suspended")}>Suspend Payment</button>
+                  <button className="btn-secondary" onClick={() => setShowModal(false)}>Cancel</button>
+                </div>
+              </div>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

@@ -1,4 +1,6 @@
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useState, useEffect } from "react";
+import axios from "axios";
+import API_URL from "../../config";
 
 const TransactionsContext = createContext();
 
@@ -10,24 +12,48 @@ export const TransactionsProvider = ({ children }) => {
   const [suspendedTasks, setSuspendedTasks] = useState([]);
   const [queriedTasks, setQueriedTasks] = useState([]);
 
-  const handleProcess = (taskId, status) => {
-    setPendingTasks((prev) =>
-      prev.filter((task) => {
-        if (task.taskId === taskId) {
-          const updatedTask = { ...task, status };
-          if (status === "Approved") {
-            setApprovedTasks((prev) => [...prev, updatedTask]);
-          } else if (status === "Suspended") {
-            setSuspendedTasks((prev) => [...prev, updatedTask]);
-          } else if (status === "Queried") {
-            setQueriedTasks((prev) => [...prev, updatedTask]);
-          }
-          return false;
-        }
-        return true;
-      })
-    );
-  };
+  const isAuthenticated = !!localStorage.getItem("authToken");
+
+  useEffect(() => {
+    if (!isAuthenticated || window.location.pathname === "/") {
+      return;
+    }
+
+    const fetchTransactions = async () => {
+      try {
+        const token = localStorage.getItem("authToken");
+        const response = await axios.get(`${API_URL}/tickets`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        console.log("Raw API Response:", response.data); // Debugging: Check what API returns
+
+        const formattedTasks = response.data.map((task) => {
+          console.log("Processing Task:", task); // Debugging: Check individual tasks
+          return {
+            client: task.client_name || "Unknown Client",
+            taskId: task.ticket_code || "No Task ID",
+            phone: task.client_phone || "No Phone",
+            services: task.service_details || "No Services",
+            amount: task.price ? `₦${task.price}` : "No Amount",
+            status: task.status || "Unknown",
+          };
+        });
+
+        console.log("Formatted Tasks:", formattedTasks); // Debugging: Check final structure
+
+        setPendingTasks(formattedTasks.filter((t) => t.status === "Pending"));
+        setApprovedTasks(formattedTasks.filter((t) => t.status === "Completed"));
+        setSuspendedTasks(formattedTasks.filter((t) => t.status === "Suspended"));
+        setQueriedTasks(formattedTasks.filter((t) => t.status === "Queried"));
+
+      } catch (error) {
+        console.error("Error fetching transactions:", error);
+      }
+    };
+
+    fetchTransactions();
+  }, [isAuthenticated]);
 
   return (
     <TransactionsContext.Provider
@@ -37,7 +63,6 @@ export const TransactionsProvider = ({ children }) => {
         suspendedTasks,
         queriedTasks,
         setPendingTasks,
-        handleProcess,
       }}
     >
       {children}
