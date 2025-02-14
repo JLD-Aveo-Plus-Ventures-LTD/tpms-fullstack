@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom"; // Import useNavigate for routing
 import CashierSideBar from "./CashierSideBar";
 import "../stylings/Transactions.css";
 import "../stylings/CashierDashboard.css";
@@ -8,9 +9,9 @@ import API_URL from "../../config";
 
 const CashierIncoming = () => {
   const { pendingTasks } = useTransactions();
+  const navigate = useNavigate(); // Initialize useNavigate for navigation
   const [currentTime, setCurrentTime] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
-  const [activeTab, setActiveTab] = useState("Incoming");
   const [showModal, setShowModal] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
   const [formData, setFormData] = useState({
@@ -52,7 +53,7 @@ const CashierIncoming = () => {
   const processPayment = async (status) => {
     const { amount, paymentMethod, discrepancyReason } = formData;
 
-    // Extract price safely (Ensure it exists)
+    // Extract price safely
     const expectedAmount = parseFloat((selectedTask?.amount || selectedTask?.price || "0").replace("₦", "").replace(",", ""));
     const numericAmount = parseFloat(amount);
 
@@ -105,12 +106,20 @@ const CashierIncoming = () => {
       <div className="transactions-content">
         {/* Header */}
         <header className="header">
-          <h6>Transaction &gt; <span className="activeStatus">{activeTab}</span></h6>
+          <h6>Transaction &gt; <span className="activeStatus">Incoming</span></h6>
           <div className="time-display"><span>Time:</span> {currentTime}</div>
           <div className="notification-bell"><i className="fas fa-bell"></i></div>
         </header>
 
         <h2>Tasks</h2>
+
+        {/* Tabs - Navigating to correct pages */}
+        <div className="tabs">
+          <p className="tab active-tab">Incoming</p> {/* Stay on this page */}
+          <p className="tab" onClick={() => navigate("/CashierApproved")}>Approved</p> {/* Go to Approved Transactions */}
+          <p className="tab" onClick={() => navigate("/CashierSuspended")}>Suspended</p> {/* Go to Suspended Transactions */}
+          <p className="tab" onClick={() => navigate("/CashierQueried")}>Queried</p> {/* Go to Queried Transactions */}
+        </div>
 
         {/* Search Bar */}
         <div className="search-bar">
@@ -144,7 +153,7 @@ const CashierIncoming = () => {
                     <td>{task.taskId || task.ticket_code}</td>
                     <td>{task.client_phone || task.phone}</td>
                     <td>{task.service_details || task.services}</td>
-                    <td>{task.amount || task.price}</td>
+                    <td>₦{task.amount || task.price}</td>
                     <td>
                       <button className="btn-process" onClick={() => handleOpenModal(task)}>
                         Process Payment
