@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from "react";
 import Sidebar from "./Sidebar";
 import "../stylings/Transactions.css";
-import { useTransactions } from "./TransactionsContext";
+import axios from "axios"; // Import axios for making HTTP requests
+import API_URL from "../../config"; // Import the API URL from your config file
 
 const Transactions = () => {
+  // Helper function to generate random Task IDs (used for frontend-only purposes)
   const generateTaskId = () =>
     Math.random().toString(36).substr(2, 7).toUpperCase();
+
+  // State to manage tasks for creating new tickets
   const [tasks, setTasks] = useState([
     {
       id: 1,
@@ -16,10 +20,55 @@ const Transactions = () => {
       date: new Date().toDateString(),
     },
   ]);
-  const [services, setServices] = useState([{ name: "", amount: "" }]);
-  const [currentTime, setCurrentTime] = useState("");
-  const { pendingTasks, setPendingTasks } = useTransactions();
 
+  // State to manage services for a task
+  const [services, setServices] = useState([{ name: "", amount: "" }]);
+
+  // State to store pending tasks fetched from the backend
+  const [pendingTasks, setPendingTasks] = useState([]);
+
+  // State to manage and display the current time
+  const [currentTime, setCurrentTime] = useState("");
+
+  // Fetch pending tasks from the backend when the component mounts
+  useEffect(() => {
+    const fetchPendingTasks = async () => {
+      try {
+        const token = localStorage.getItem("authToken"); // Get the authentication token
+        const response = await axios.get(`${API_URL}/tickets`, {
+          headers: { Authorization: `Bearer ${token}` }, // Include the token in the request headers
+        });
+  
+        // Map the backend response to the frontend's expected structure
+        const formattedTasks = response.data.map((task) => ({
+          client: task.client_name || "N/A",
+          taskId: task.ticket_code || "N/A",
+          phone: task.client_phone || "N/A",
+          services: task.service_details || "N/A",
+          amount: task.price ? `₦${task.price}` : "N/A",
+          status: task.status || "N/A",
+          date: task.created_at || new Date().toISOString(), // Ensure a valid date field
+        }));
+  
+        //  Fix: Reverse the last 5 transactions to show the newest first
+        const sortedTasks = formattedTasks
+          .sort((a, b) => new Date(b.date) - new Date(a.date)) // Sort by date descending
+          .slice(-5) // Get the last 5 transactions
+          .reverse(); // Reverse the last 5 transactions so the newest is first
+  
+        setPendingTasks(sortedTasks); // Update state with the latest 5 tickets
+      } catch (error) {
+        console.error("Error fetching tasks:", error);
+        alert("Failed to fetch tasks. Please try again.");
+      }
+    };
+  
+    fetchPendingTasks();
+  }, []);
+  
+  
+
+  // Effect to update the current time every second
   useEffect(() => {
     const updateCurrentTime = () => {
       const now = new Date();
@@ -33,22 +82,24 @@ const Transactions = () => {
     const interval = setInterval(updateCurrentTime, 1000);
     updateCurrentTime();
 
-    return () => clearInterval(interval);
+    return () => clearInterval(interval); // Cleanup interval on unmount
   }, []);
 
+  // Calculate the total price of services
   const calculateTotal = () =>
     services.reduce(
       (total, service) => total + (parseFloat(service.amount) || 0),
       0
     );
 
-  const submitTransaction = (client, phone) => {
+  // Submit transaction to the backend
+  const submitTransaction = async (client, phone) => {
     const totalAmount = calculateTotal();
-    const servicesSummary = services
-      .filter((service) => service.name)
-      .map((service) => service.name)
-      .join(", ");
+    const filteredServices = services.filter(
+      (service) => service.name && service.amount
+    );
 
+    // Input validation
     if (!client.trim()) {
       alert("Client name cannot be empty.");
       return;
@@ -57,7 +108,7 @@ const Transactions = () => {
       alert("Enter a valid phone number.");
       return;
     }
-    if (!servicesSummary) {
+    if (filteredServices.length === 0) {
       alert("Please add at least one valid service.");
       return;
     }
@@ -66,31 +117,60 @@ const Transactions = () => {
       return;
     }
 
-    const currentTask = tasks[0];
+    try {
+      const token = localStorage.getItem("authToken"); // Get the authentication token
+      const response = await axios.post(
+        `${API_URL}/tickets`,
+        {
+          client_name: client,
+          client_phone: phone,
+          services: filteredServices.map((service) => ({
+            name: service.name,
+            price: parseFloat(service.amount), // Ensure the amount is a number
+          })),
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Include the token in the request headers
+          },
+        }
+      );
 
-    const newPendingTask = {
-      client,
-      taskId: currentTask.taskId,
-      phone,
-      services: servicesSummary,
-      amount: totalAmount,
-      status: "Pending",
-    };
+      // Update the local state with the response from the backend
+      const newTask = {
+        client: client,
+        taskId: response.data.ticket_code, // Use the ticket_code from the backend
+        phone: phone,
+        services: filteredServices.map((s) => s.name).join(", "), // Join services for display
+        amount: response.data.total_price, // Use the total_price from the backend
+        status: "Pending",
+        date: new Date().toISOString(), // Add a date field for sorting
+      };
 
-    setPendingTasks([...pendingTasks, newPendingTask]);
+      // Add the new task to the top of the list and limit to the last 5 transactions
+      const updatedTasks = [newTask, ...pendingTasks].slice(0, 5);
 
-    setTasks((prevTasks) => [
-      {
-        ...prevTasks[0],
-        taskId: generateTaskId(),
-        client: "",
-        phone: "",
-      },
-    ]);
+      setPendingTasks(updatedTasks); // Update the state with the new task list
 
-    setServices([{ name: "", amount: "" }]);
+      // Reset the form for the next task
+      setTasks((prevTasks) => [
+        {
+          ...prevTasks[0],
+          taskId: generateTaskId(),
+          client: "",
+          phone: "",
+        },
+      ]);
+
+      setServices([{ name: "", amount: "" }]); // Reset services
+      alert("Transaction submitted successfully!");
+    } catch (error) {
+      console.error("Error submitting transaction:", error);
+      alert("Failed to submit transaction. Please try again.");
+    }
   };
 
+  // Keep all your existing UI-related functions and state management
   const toggleMinimize = (id) => {
     setTasks((prevTasks) =>
       prevTasks.map((task) =>
@@ -131,6 +211,7 @@ const Transactions = () => {
     setServices([{ name: "", amount: "" }]);
   };
 
+  // Render the UI (no changes here except for the pendingTasks table)
   return (
     <div className="transactions-container">
       <Sidebar />
@@ -305,6 +386,7 @@ const Transactions = () => {
           Add Task
         </button>
 
+        {/* Display pending tasks fetched from the backend */}
         <div>
           <table>
             <thead>
