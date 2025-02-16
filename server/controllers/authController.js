@@ -44,8 +44,6 @@ exports.createUser = async (req, res) => {
 exports.login = (req, res) => {
   const { username, email, password } = req.body;
 
-  console.log("Login Request:", { username, email }); // Debug: Log incoming request
-
   const query = username
     ? "SELECT * FROM users WHERE username = ?"
     : "SELECT * FROM users WHERE email = ?";
@@ -58,18 +56,15 @@ exports.login = (req, res) => {
 
     const user = results[0];
     if (user) {
-      console.log("User Found:", user); // Debug log
       const passwordMatch = await bcrypt.compare(password, user.password);
 
       if (passwordMatch) {
-        // Transform 'operations' role to 'operator' for consistency
+        // Ensure the role matches frontend expectations
         const transformedRole = user.role === "operations" ? "operator" : user.role;
 
-        // Generate a token with the transformed role
-        const token = generateToken({ ...user, role: transformedRole });
+        console.log("Final Role Sent to Frontend:", transformedRole); // ✅ Debug log
 
-        console.log("Generated Token:", token); // Debug
-        console.log("Role Sent to Frontend:", transformedRole);
+        const token = generateToken({ ...user, role: transformedRole });
 
         return res.json({ token, role: transformedRole }); // Send transformed role
       }
@@ -79,6 +74,7 @@ exports.login = (req, res) => {
     res.status(401).json({ error: "Invalid username/email or password" });
   });
 };
+
 
 
 
